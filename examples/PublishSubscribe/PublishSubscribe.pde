@@ -4,7 +4,7 @@ MQTTClient client;
 
 void setup() {
   client = new MQTTClient(this);
-  client.connect("mqtt://demo:demo@connect.shiftr.io");
+  client.connect("mqtt://demo:demo@connect.shiftr.io", "my-client");
   client.subscribe("/hello");
   // client.unsubscribe("/hello");
 }
@@ -15,6 +15,6 @@ void keyPressed() {
   client.publish("/hello", "world");
 }
 
-void mqttMessageReceived(String topic, String payload) {
-
+void messageReceived(String topic, String payload) {
+  println("new message: " + topic + " - " + payload);
 }
