@@ -97,6 +97,8 @@ public class MQTTClient implements MqttCallback {
 			client = new MqttClient("tcp://" + uri.getHost(), theID);
 			client.setCallback(this);
 			client.connect(options);
+
+			System.out.println("[MQTT] connected to: " + uri.getHost());
 		} catch (MqttException e) {
 			System.out.println("[MQTT] failed to connect: " + e.getMessage());
 		}
