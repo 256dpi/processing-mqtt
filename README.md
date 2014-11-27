@@ -4,7 +4,7 @@
 
 ## Download
 
-[Download version 1.0.0 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.0.0/mqtt.zip)
+[Download version 1.0.1 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.0.1/mqtt.zip)
 
 ## Example
 
