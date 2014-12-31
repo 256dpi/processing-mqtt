@@ -15,6 +15,6 @@ void keyPressed() {
   client.publish("/hello", "world");
 }
 
-void messageReceived(String topic, String payload) {
-  println("new message: " + topic + " - " + payload);
+void messageReceived(String topic, byte[] payload) {
+  println("new message: " + topic + " - " + new String(payload));
 }

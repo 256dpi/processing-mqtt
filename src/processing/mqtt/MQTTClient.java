@@ -62,7 +62,7 @@ public class MQTTClient implements MqttCallback {
 	public MqttClient client;
 
 	/**
-	 * a Constructor, usually called in the setup() method in your sketch to
+	 * The constructor, usually called in the setup() method in your sketch to
 	 * initialize and start the library.
 	 * 
 	 * @example PublishSubscribe
@@ -75,6 +75,13 @@ public class MQTTClient implements MqttCallback {
 		System.out.println("##library.name## ##library.prettyVersion## by ##author##");
 	}
 
+	/**
+	 * Connect to a broker using a URI and clientId.
+	 *
+	 * @example PublishSubscribe
+	 * @param theUri
+	 * @param theId
+	 */
 	public void connect(String theUri, String theID) {
 		URI uri = null;
 		try {
@@ -104,6 +111,13 @@ public class MQTTClient implements MqttCallback {
 		}
 	}
 
+	/**
+	 * Publish a message with a topic and payload.
+	 *
+	 * @example PublishSubscribe
+	 * @param topic
+	 * @param payload
+	 */
 	public void publish(String topic, String payload) {
 		try {
 			client.publish(topic, payload.getBytes(Charset.forName("UTF-8")), 0, false);
@@ -112,6 +126,12 @@ public class MQTTClient implements MqttCallback {
 		}
 	}
 
+	/**
+	 * Subscribe a topic.
+	 *
+	 * @example PublishSubscribe
+	 * @param topic
+	 */
 	public void subscribe(String topic) {
 		try {
 			client.subscribe(topic, 0);
@@ -120,6 +140,12 @@ public class MQTTClient implements MqttCallback {
 		}
 	}
 
+	/**
+	 * Unsubscrbe a topic.
+	 *
+	 * @example PublishSubscribe
+	 * @param topic
+	 */
 	public void unsubscribe(String topic) {
 		try {
 			client.unsubscribe(topic);
@@ -128,6 +154,11 @@ public class MQTTClient implements MqttCallback {
 		}
 	}
 
+	/**
+	 * Disconnect from the broker.
+	 *
+	 * @example PublishSubscribe
+	 */
 	public void disconnect() {
 		try {
 			client.disconnect();
@@ -141,14 +172,12 @@ public class MQTTClient implements MqttCallback {
 	}
 
 	@Override
-	public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
-	}
+	public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
 
 	@Override
-	public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+	public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
 		if(messageReceivedMethod != null) {
-			messageReceivedMethod.invoke(parent, s, new String(mqttMessage.getPayload(), "UTF-8"));
+			messageReceivedMethod.invoke(parent, topic, mqttMessage.getPayload());
 		}
 	}
 
@@ -159,7 +188,7 @@ public class MQTTClient implements MqttCallback {
 
 	private Method findCallback(final String name) {
 		try {
-			return parent.getClass().getMethod(name, String.class, String.class);
+			return parent.getClass().getMethod(name, String.class, byte[].class);
 		} catch (Exception e) {
 			System.out.println("[MQTT] messageReceived callback not found!");
 			return null;
