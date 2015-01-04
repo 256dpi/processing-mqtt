@@ -106,6 +106,7 @@ public class MQTTClient implements MqttCallback {
 			} else {
 				client = new MqttClient("tcp://" + uri.getHost(), theID);
 			}
+
 			client.setCallback(this);
 			client.connect(options);
 
