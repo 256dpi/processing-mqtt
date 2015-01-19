@@ -46,6 +46,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import processing.core.PApplet;
 
 /**
@@ -102,9 +103,9 @@ public class MQTTClient implements MqttCallback {
 			}
 
 			if (uri.getPort()!=-1){ 
-				client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID);
+				client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID, new MemoryPersistence());
 			} else {
-				client = new MqttClient("tcp://" + uri.getHost(), theID);
+				client = new MqttClient("tcp://" + uri.getHost(), theID, new MemoryPersistence());
 			}
 
 			client.setCallback(this);
