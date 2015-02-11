@@ -118,6 +118,16 @@ public class MQTTClient implements MqttCallback {
 	}
 
 	/**
+	 * Publish a message with a topic.
+	 *
+	 * @param topic
+	 */
+	public void publish(String topic) {
+		byte[] bytes = {};
+		this.publish(topic, bytes);
+	}
+
+	/**
 	 * Publish a message with a topic and payload.
 	 *
 	 * @example PublishSubscribe
@@ -125,8 +135,30 @@ public class MQTTClient implements MqttCallback {
 	 * @param payload
 	 */
 	public void publish(String topic, String payload) {
+		this.publish(topic, payload.getBytes(Charset.forName("UTF-8")));
+	}
+
+	/**
+	 * Publish a message with a topic and payload.
+	 *
+	 * @param topic
+	 * @param payload
+	 */
+	public void publish(String topic, byte[] payload) {
+		this.publish(topic, payload, 0, false);
+	}
+
+	/**
+	 * Publish a message with a topic, payload qos and retain flag.
+	 *
+	 * @param topic
+	 * @param payload
+	 * @param qos
+	 * @param retained
+	 */
+	public void publish(String topic, byte[] payload, int qos, boolean retained) {
 		try {
-			client.publish(topic, payload.getBytes(Charset.forName("UTF-8")), 0, false);
+			client.publish(topic, payload, qos, retained);
 		} catch (MqttException e) {
 			System.out.println("[MQTT] failed to publish: " + e.getMessage());
 		}
