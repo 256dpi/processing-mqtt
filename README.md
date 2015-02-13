@@ -10,7 +10,7 @@ This library is an alternative to the [Qatja](https://github.com/Qatja/processin
 
 ## Download
 
-[Download version 1.2.1 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.2.1/mqtt.zip)
+[Download version 1.2.2 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.2.2/mqtt.zip)
 
 ## Example
 
