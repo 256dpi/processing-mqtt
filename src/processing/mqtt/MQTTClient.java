@@ -68,162 +68,162 @@ class Message {
  */
 
 public class MQTTClient implements MqttCallback {
-	PApplet parent;
+  PApplet parent;
 
   ArrayList<Message> messages;
 
-	Method messageReceivedMethod;
+  Method messageReceivedMethod;
 
-	public MqttClient client;
+  public MqttClient client;
 
-	/**
-	 * The constructor, usually called in the setup() method in your sketch to
-	 * initialize and start the library.
-	 *
-	 * @example PublishSubscribe
-	 * @param theParent
-	 */
-	public MQTTClient(PApplet theParent) {
-		parent = theParent;
+  /**
+   * The constructor, usually called in the setup() method in your sketch to
+   * initialize and start the library.
+   *
+   * @example PublishSubscribe
+   * @param theParent
+   */
+  public MQTTClient(PApplet theParent) {
+    parent = theParent;
     messages = new ArrayList<Message>(10);
-		parent.registerMethod("dispose", this);
+    parent.registerMethod("dispose", this);
     parent.registerMethod("draw", this);
-		messageReceivedMethod = findCallback("messageReceived");
-		System.out.println("##library.name## ##library.prettyVersion## by ##author##");
-	}
+    messageReceivedMethod = findCallback("messageReceived");
+    System.out.println("##library.name## ##library.prettyVersion## by ##author##");
+  }
 
-	/**
-	 * Connect to a broker using a URI and clientId.
-	 *
-	 * @example PublishSubscribe
-	 * @param theUri
-	 * @param theId
-	 */
-	public void connect(String theUri, String theID) {
-		URI uri = null;
-		try {
-			uri = new URI(theUri);
-		} catch(URISyntaxException e) {
-			System.out.println("[MQTT] failed to parse URI: " + e.getMessage());
-		}
+  /**
+   * Connect to a broker using a URI and clientId.
+   *
+   * @example PublishSubscribe
+   * @param theUri
+   * @param theId
+   */
+  public void connect(String theUri, String theID) {
+    URI uri = null;
+    try {
+      uri = new URI(theUri);
+    } catch(URISyntaxException e) {
+      System.out.println("[MQTT] failed to parse URI: " + e.getMessage());
+    }
 
-	 	try {
-			MqttConnectOptions options = new MqttConnectOptions();
+     try {
+      MqttConnectOptions options = new MqttConnectOptions();
 
-			String[] auth = uri.getUserInfo().split(":");
-			if(auth.length > 0) {
-				String user = auth[0];
-				String pass = auth[1];
-				options.setUserName(user);
-				options.setPassword(pass.toCharArray());
-			}
+      String[] auth = uri.getUserInfo().split(":");
+      if(auth.length > 0) {
+        String user = auth[0];
+        String pass = auth[1];
+        options.setUserName(user);
+        options.setPassword(pass.toCharArray());
+      }
 
-			if (uri.getPort()!=-1){
-				client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID, new MemoryPersistence());
-			} else {
-				client = new MqttClient("tcp://" + uri.getHost(), theID, new MemoryPersistence());
-			}
+      if (uri.getPort()!=-1){
+        client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID, new MemoryPersistence());
+      } else {
+        client = new MqttClient("tcp://" + uri.getHost(), theID, new MemoryPersistence());
+      }
 
-			client.setCallback(this);
-			client.connect(options);
+      client.setCallback(this);
+      client.connect(options);
 
-			System.out.println("[MQTT] connected to: " + uri.getHost());
-		} catch (MqttException e) {
-			System.out.println("[MQTT] failed to connect: " + e.getMessage());
-		}
-	}
+      System.out.println("[MQTT] connected to: " + uri.getHost());
+    } catch (MqttException e) {
+      System.out.println("[MQTT] failed to connect: " + e.getMessage());
+    }
+  }
 
-	/**
-	 * Publish a message with a topic.
-	 *
-	 * @param topic
-	 */
-	public void publish(String topic) {
-		byte[] bytes = {};
-		this.publish(topic, bytes);
-	}
+  /**
+   * Publish a message with a topic.
+   *
+   * @param topic
+   */
+  public void publish(String topic) {
+    byte[] bytes = {};
+    this.publish(topic, bytes);
+  }
 
-	/**
-	 * Publish a message with a topic and payload.
-	 *
-	 * @example PublishSubscribe
-	 * @param topic
-	 * @param payload
-	 */
-	public void publish(String topic, String payload) {
-		this.publish(topic, payload.getBytes(Charset.forName("UTF-8")));
-	}
+  /**
+   * Publish a message with a topic and payload.
+   *
+   * @example PublishSubscribe
+   * @param topic
+   * @param payload
+   */
+  public void publish(String topic, String payload) {
+    this.publish(topic, payload.getBytes(Charset.forName("UTF-8")));
+  }
 
-	/**
-	 * Publish a message with a topic and payload.
-	 *
-	 * @param topic
-	 * @param payload
-	 */
-	public void publish(String topic, byte[] payload) {
-		this.publish(topic, payload, 0, false);
-	}
+  /**
+   * Publish a message with a topic and payload.
+   *
+   * @param topic
+   * @param payload
+   */
+  public void publish(String topic, byte[] payload) {
+    this.publish(topic, payload, 0, false);
+  }
 
-	/**
-	 * Publish a message with a topic, payload qos and retain flag.
-	 *
-	 * @param topic
-	 * @param payload
-	 * @param qos
-	 * @param retained
-	 */
-	public void publish(String topic, byte[] payload, int qos, boolean retained) {
-		try {
-			client.publish(topic, payload, qos, retained);
-		} catch (MqttException e) {
-			System.out.println("[MQTT] failed to publish: " + e.getMessage());
-		}
-	}
+  /**
+   * Publish a message with a topic, payload qos and retain flag.
+   *
+   * @param topic
+   * @param payload
+   * @param qos
+   * @param retained
+   */
+  public void publish(String topic, byte[] payload, int qos, boolean retained) {
+    try {
+      client.publish(topic, payload, qos, retained);
+    } catch (MqttException e) {
+      System.out.println("[MQTT] failed to publish: " + e.getMessage());
+    }
+  }
 
-	/**
-	 * Subscribe a topic.
-	 *
-	 * @example PublishSubscribe
-	 * @param topic
-	 */
-	public void subscribe(String topic) {
-		try {
-			client.subscribe(topic, 0);
-		} catch (MqttException e) {
-			System.out.println("[MQTT] failed to subscribe: " + e.getMessage());
-		}
-	}
+  /**
+   * Subscribe a topic.
+   *
+   * @example PublishSubscribe
+   * @param topic
+   */
+  public void subscribe(String topic) {
+    try {
+      client.subscribe(topic, 0);
+    } catch (MqttException e) {
+      System.out.println("[MQTT] failed to subscribe: " + e.getMessage());
+    }
+  }
 
-	/**
-	 * Unsubscrbe a topic.
-	 *
-	 * @example PublishSubscribe
-	 * @param topic
-	 */
-	public void unsubscribe(String topic) {
-		try {
-			client.unsubscribe(topic);
-		} catch (MqttException e) {
-			System.out.println("[MQTT] failed to unsubscribe: " + e.getMessage());
-		}
-	}
+  /**
+   * Unsubscrbe a topic.
+   *
+   * @example PublishSubscribe
+   * @param topic
+   */
+  public void unsubscribe(String topic) {
+    try {
+      client.unsubscribe(topic);
+    } catch (MqttException e) {
+      System.out.println("[MQTT] failed to unsubscribe: " + e.getMessage());
+    }
+  }
 
-	/**
-	 * Disconnect from the broker.
-	 *
-	 * @example PublishSubscribe
-	 */
-	public void disconnect() {
-		try {
-			client.disconnect();
-		} catch (MqttException e) {
-			System.out.println("[MQTT] failed to disconnect!" + e.getMessage());
-		}
-	}
+  /**
+   * Disconnect from the broker.
+   *
+   * @example PublishSubscribe
+   */
+  public void disconnect() {
+    try {
+      client.disconnect();
+    } catch (MqttException e) {
+      System.out.println("[MQTT] failed to disconnect!" + e.getMessage());
+    }
+  }
 
-	public void dispose() {
-		disconnect();
-	}
+  public void dispose() {
+    disconnect();
+  }
 
   public void draw() throws Exception {
     synchronized (messages) {
@@ -234,29 +234,29 @@ public class MQTTClient implements MqttCallback {
     }
   }
 
-	@Override
-	public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
+  @Override
+  public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
 
-	@Override
-	public void messageArrived(String topic, MqttMessage mqttMessage) {
+  @Override
+  public void messageArrived(String topic, MqttMessage mqttMessage) {
     if(messageReceivedMethod != null) {
       synchronized (messages) {
         messages.add(new Message(topic, mqttMessage));
       }
     }
-	}
+  }
 
-	@Override
-	public void connectionLost(Throwable throwable) {
-		System.out.println("[MQTT] lost connection!" + throwable.getMessage());
-	}
+  @Override
+  public void connectionLost(Throwable throwable) {
+    System.out.println("[MQTT] lost connection!" + throwable.getMessage());
+  }
 
-	private Method findCallback(final String name) {
-		try {
-			return parent.getClass().getMethod(name, String.class, byte[].class);
-		} catch (Exception e) {
-			System.out.println("[MQTT] messageReceived callback not found!");
-			return null;
-		}
-	}
+  private Method findCallback(final String name) {
+    try {
+      return parent.getClass().getMethod(name, String.class, byte[].class);
+    } catch (Exception e) {
+      System.out.println("[MQTT] messageReceived callback not found!");
+      return null;
+    }
+  }
 }
