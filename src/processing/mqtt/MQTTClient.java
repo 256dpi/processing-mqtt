@@ -38,6 +38,7 @@ import java.lang.Throwable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -49,6 +50,17 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import processing.core.PApplet;
 
+class Message {
+  String topic;
+  MqttMessage message;
+
+  Message(String _topic, MqttMessage _message) {
+    topic = _topic;
+    message = _message;
+  }
+}
+
+
 /**
  * An MQTTClient that can publish and subscribe.
  *
@@ -58,6 +70,8 @@ import processing.core.PApplet;
 public class MQTTClient implements MqttCallback {
 	PApplet parent;
 
+  ArrayList<Message> messages;
+
 	Method messageReceivedMethod;
 
 	public MqttClient client;
@@ -65,13 +79,15 @@ public class MQTTClient implements MqttCallback {
 	/**
 	 * The constructor, usually called in the setup() method in your sketch to
 	 * initialize and start the library.
-	 * 
+	 *
 	 * @example PublishSubscribe
 	 * @param theParent
 	 */
 	public MQTTClient(PApplet theParent) {
 		parent = theParent;
+    messages = new ArrayList<Message>(10);
 		parent.registerMethod("dispose", this);
+    parent.registerMethod("draw", this);
 		messageReceivedMethod = findCallback("messageReceived");
 		System.out.println("##library.name## ##library.prettyVersion## by ##author##");
 	}
@@ -91,7 +107,7 @@ public class MQTTClient implements MqttCallback {
 			System.out.println("[MQTT] failed to parse URI: " + e.getMessage());
 		}
 
-		try {
+	 	try {
 			MqttConnectOptions options = new MqttConnectOptions();
 
 			String[] auth = uri.getUserInfo().split(":");
@@ -102,7 +118,7 @@ public class MQTTClient implements MqttCallback {
 				options.setPassword(pass.toCharArray());
 			}
 
-			if (uri.getPort()!=-1){ 
+			if (uri.getPort()!=-1){
 				client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID, new MemoryPersistence());
 			} else {
 				client = new MqttClient("tcp://" + uri.getHost(), theID, new MemoryPersistence());
@@ -209,14 +225,25 @@ public class MQTTClient implements MqttCallback {
 		disconnect();
 	}
 
+  public void draw() throws Exception {
+    synchronized (messages) {
+      for(Message message: messages) {
+        messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
+      }
+      messages.clear();
+    }
+  }
+
 	@Override
 	public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
 
 	@Override
-	public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-		if(messageReceivedMethod != null) {
-			messageReceivedMethod.invoke(parent, topic, mqttMessage.getPayload());
-		}
+	public void messageArrived(String topic, MqttMessage mqttMessage) {
+    if(messageReceivedMethod != null) {
+      synchronized (messages) {
+        messages.add(new Message(topic, mqttMessage));
+      }
+    }
 	}
 
 	@Override
