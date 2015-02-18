@@ -107,8 +107,9 @@ public class MQTTClient implements MqttCallback {
       System.out.println("[MQTT] failed to parse URI: " + e.getMessage());
     }
 
-     try {
+    try {
       MqttConnectOptions options = new MqttConnectOptions();
+
       if (uri.getUserInfo()!=null) {
         String[] auth = uri.getUserInfo().split(":");
         if(auth.length > 0) {
@@ -118,7 +119,7 @@ public class MQTTClient implements MqttCallback {
           options.setPassword(pass.toCharArray());
         }
       }
-      
+
       if (uri.getPort()!=-1){
         client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID, new MemoryPersistence());
       } else {
