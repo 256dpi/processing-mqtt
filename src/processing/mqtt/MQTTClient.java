@@ -109,15 +109,16 @@ public class MQTTClient implements MqttCallback {
 
      try {
       MqttConnectOptions options = new MqttConnectOptions();
-
-      String[] auth = uri.getUserInfo().split(":");
-      if(auth.length > 0) {
-        String user = auth[0];
-        String pass = auth[1];
-        options.setUserName(user);
-        options.setPassword(pass.toCharArray());
+      if (uri.getUserInfo()!=null) {
+        String[] auth = uri.getUserInfo().split(":");
+        if(auth.length > 0) {
+          String user = auth[0];
+          String pass = auth[1];
+          options.setUserName(user);
+          options.setPassword(pass.toCharArray());
+        }
       }
-
+      
       if (uri.getPort()!=-1){
         client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID, new MemoryPersistence());
       } else {
