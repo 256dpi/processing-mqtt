@@ -21,7 +21,7 @@ MQTTClient client;
 
 void setup() {
   client = new MQTTClient(this);
-  client.connect("mqtt://demo:demo@connect.shiftr.io", "my-client");
+  client.connect("mqtt://try:try@broker.shiftr.io", "my-client");
   client.subscribe("/hello");
   // client.unsubscribe("/hello");
 }
