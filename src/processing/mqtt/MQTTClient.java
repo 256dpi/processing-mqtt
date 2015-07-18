@@ -93,22 +93,35 @@ public class MQTTClient implements MqttCallback {
   }
 
   /**
-   * Connect to a broker using a URI and clientId.
+   * Connect to a broker using an broker URI and client ID.
+   *
+   * @param brokerURI
+   * @param clientID
+   */
+  public void connect(String brokerURI, String clientID) {
+    this.connect(brokerURI, clientID, true);
+  }
+
+  /**
+   * Connect to a broker using an broker URI, client Id and cleanSession flag.
    *
    * @example PublishSubscribe
-   * @param theUri
-   * @param theId
+   * @param brokerURI
+   * @param clientId
+   * @param cleanSession
    */
-  public void connect(String theUri, String theID) {
+  public void connect(String brokerURI, String clientId, boolean cleanSession) {
     URI uri = null;
     try {
-      uri = new URI(theUri);
+      uri = new URI(brokerURI);
     } catch(URISyntaxException e) {
       System.out.println("[MQTT] failed to parse URI: " + e.getMessage());
     }
 
     try {
       MqttConnectOptions options = new MqttConnectOptions();
+
+      options.setCleanSession(cleanSession);
 
       if (uri.getUserInfo()!=null) {
         String[] auth = uri.getUserInfo().split(":");
@@ -121,9 +134,9 @@ public class MQTTClient implements MqttCallback {
       }
 
       if (uri.getPort()!=-1){
-        client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), theID, new MemoryPersistence());
+        client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), clientId, new MemoryPersistence());
       } else {
-        client = new MqttClient("tcp://" + uri.getHost(), theID, new MemoryPersistence());
+        client = new MqttClient("tcp://" + uri.getHost(), clientId, new MemoryPersistence());
       }
 
       client.setCallback(this);
