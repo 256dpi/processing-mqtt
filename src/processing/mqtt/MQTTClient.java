@@ -197,6 +197,20 @@ public class MQTTClient implements MqttCallback {
   }
 
   /**
+   * Subscribe a topic with QoS.
+   *
+   * @param topic
+   * @param qos
+   */
+  public void subscribe(String topic, int qos) {
+    try {
+      client.subscribe(topic, qos);
+    } catch (MqttException e) {
+      System.out.println("[MQTT] failed to subscribe: " + e.getMessage());
+    }
+  }
+
+  /**
    * Unsubscrbe a topic.
    *
    * @example PublishSubscribe
