@@ -60,6 +60,19 @@ class Message {
   }
 }
 
+class Will {
+  String topic;
+  byte[] payload;
+  int qos;
+  boolean retained;
+
+  Will(String topic, byte[] payload, int qos, boolean retained) {
+    this.topic = topic;
+    this.payload = payload;
+    this.qos = qos;
+    this.retained = retained;
+  }
+}
 
 /**
  * An MQTTClient that can publish and subscribe.
@@ -71,6 +84,7 @@ public class MQTTClient implements MqttCallback {
   PApplet parent;
 
   ArrayList<Message> messages;
+  Will will;
 
   Method messageReceivedMethod;
 
@@ -90,6 +104,30 @@ public class MQTTClient implements MqttCallback {
     parent.registerMethod("draw", this);
     messageReceivedMethod = findCallback("messageReceived");
     System.out.println("##library.name## ##library.prettyVersion## by ##author##");
+  }
+
+  /**
+   * Set a last will message with topic, payload, QoS and the retained flag.
+   *
+   * @param topic
+   * @param payload
+   * @param qos
+   * @param retained
+   */
+  public void setWill(String topic, String payload, int qos, boolean retained) {
+    setWill(topic, payload.getBytes(Charset.forName("UTF-8")), qos, retained);
+  }
+
+  /**
+   * Set a last will message with topic, payload, QoS and the retained flag.
+   *
+   * @param topic
+   * @param payload
+   * @param qos
+   * @param retained
+   */
+  public void setWill(String topic, byte[] payload, int qos, boolean retained) {
+    will = new Will(topic, payload, qos, retained);
   }
 
   /**
@@ -122,6 +160,10 @@ public class MQTTClient implements MqttCallback {
       MqttConnectOptions options = new MqttConnectOptions();
 
       options.setCleanSession(cleanSession);
+
+      if(will != null) {
+        options.setWill(will.topic, will.payload, will.qos, will.retained);
+      }
 
       if (uri.getUserInfo()!=null) {
         String[] auth = uri.getUserInfo().split(":");
