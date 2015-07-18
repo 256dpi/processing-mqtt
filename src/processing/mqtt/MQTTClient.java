@@ -54,9 +54,9 @@ class Message {
   String topic;
   MqttMessage message;
 
-  Message(String _topic, MqttMessage _message) {
-    topic = _topic;
-    message = _message;
+  Message(String topic, MqttMessage message) {
+    this.topic = topic;
+    this.message = message;
   }
 }
 
@@ -99,7 +99,7 @@ public class MQTTClient implements MqttCallback {
    * @param clientID
    */
   public void connect(String brokerURI, String clientID) {
-    this.connect(brokerURI, clientID, true);
+    connect(brokerURI, clientID, true);
   }
 
   /**
@@ -155,7 +155,7 @@ public class MQTTClient implements MqttCallback {
    */
   public void publish(String topic) {
     byte[] bytes = {};
-    this.publish(topic, bytes);
+    publish(topic, bytes);
   }
 
   /**
@@ -166,7 +166,7 @@ public class MQTTClient implements MqttCallback {
    * @param payload
    */
   public void publish(String topic, String payload) {
-    this.publish(topic, payload.getBytes(Charset.forName("UTF-8")));
+    publish(topic, payload.getBytes(Charset.forName("UTF-8")));
   }
 
   /**
@@ -176,7 +176,7 @@ public class MQTTClient implements MqttCallback {
    * @param payload
    */
   public void publish(String topic, byte[] payload) {
-    this.publish(topic, payload, 0, false);
+    publish(topic, payload, 0, false);
   }
 
   /**
