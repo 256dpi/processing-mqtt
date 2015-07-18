@@ -2,15 +2,13 @@
 
 **paho mqtt library wrapper for processing**
 
-This library bundles the [Java Client](https://eclipse.org/paho/clients/java/) library of the eclipse paho project and adds a thin wrapper to get an Processing like API.
-
-The first release of the library only supports QoS0 and the basic features to get going. In the next releases more of the features will be available.
+This library bundles the [Java Client](https://eclipse.org/paho/clients/java/) library of the eclipse Paho project and adds a thin wrapper to get an Processing like API.
 
 This library is an alternative to the [Qatja](https://github.com/Qatja/processing) library which only supports a limited set of features.
 
 ## Download
 
-[Download version 1.2.4 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.2.4/mqtt.zip)
+[Download version 1.3.0 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.3.0/mqtt.zip)
 
 ## Example
 
