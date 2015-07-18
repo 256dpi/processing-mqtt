@@ -141,6 +141,15 @@ public class MQTTClient implements MqttCallback {
   }
 
   /**
+   * Connect to a broker using only a broker URI.
+   *
+   * @param brokerURI
+   */
+  public void connect(String brokerURI) {
+    connect(brokerURI, MqttClient.generateClientId());
+  }
+
+  /**
    * Connect to a broker using an broker URI and client ID.
    *
    * @param brokerURI
