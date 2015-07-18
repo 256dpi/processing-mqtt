@@ -119,6 +119,16 @@ public class MQTTClient implements MqttCallback {
   }
 
   /**
+   * Set a last will message with topic and payload.
+   *
+   * @param topic
+   * @param payload
+   */
+  public void setWill(String topic, String payload) {
+    setWill(topic, payload, 0, false);
+  }
+
+  /**
    * Set a last will message with topic, payload, QoS and the retained flag.
    *
    * @param topic
