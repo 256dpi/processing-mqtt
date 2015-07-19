@@ -44,7 +44,7 @@ Instantiates a new client by supplying the parent applet. The constructor expect
 - **`MQTTClient#setWill(String topic, String payload)`**
 - **`MQTTClient#setWill(String topic, String payload, int qos, boolean retained)`**
 
-Sets the will message that gets transmitted to the server in all subsequent connect commands. For more details, see the `MQTTClient#publish` method. The QoS level and retained flag default to `0` and `false` respectively.
+Sets the will message that gets transmitted to the server in all subsequent connect commands. The QoS level and retained flag default to `0` and `false` respectively.
 
 - **`MQTTClient#connect(String brokerURI)`**
 - **`MQTTClient#connect(String brokerURI, String clientId)`**
@@ -63,7 +63,7 @@ Publishes a message to the broker using the supplied topic and the optional payl
 - **`MQTTClient#subscribe(String topic)`**
 - **`MQTTClient#subscribe(String topic, int qos)`**
 
-Subscribes to the supplied topic using the optionally provided QoS level. The QoS level defaults to `0`.
+Subscribes to the supplied topic using the optionally provided QoS level that defaults to `0`.
 
 - **`MQTTClient#unsubscribe(String topic)`**
 
