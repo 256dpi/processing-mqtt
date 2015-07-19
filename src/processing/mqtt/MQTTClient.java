@@ -231,6 +231,18 @@ public class MQTTClient implements MqttCallback {
   }
 
   /**
+   * Publish a message with a topic, payload qos and retain flag.
+   *
+   * @param topic
+   * @param payload
+   * @param qos
+   * @param retained
+   */
+  public void publish(String topic, String payload, int qos, boolean retained) {
+    publish(topic, payload.getBytes(Charset.forName("UTF-8")), qos, retained);
+  }
+
+  /**
    * Publish a message with a topic and payload.
    *
    * @param topic

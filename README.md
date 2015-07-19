@@ -54,6 +54,7 @@ Connects to the supplied broker by parsing the URL and setting the optionally su
 
 - **`MQTTClient#publish(String topic)`**
 - **`MQTTClient#publish(String topic, String payload)`**
+- **`MQTTClient#publish(String topic, String payload, int qos, boolean retained)`**
 - **`MQTTClient#publish(String topic, byte[] payload)`**
 - **`MQTTClient#publish(String topic, byte[] payload, int qos, boolean retained)`**
 
