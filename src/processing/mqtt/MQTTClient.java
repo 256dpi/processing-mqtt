@@ -227,7 +227,7 @@ public class MQTTClient implements MqttCallback {
    * @param payload
    */
   public void publish(String topic, String payload) {
-    publish(topic, payload.getBytes(Charset.forName("UTF-8")));
+    publish(topic, payload, 0, false);
   }
 
   /**
