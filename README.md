@@ -8,7 +8,7 @@ The library is an alternative to the [Qatja](https://github.com/Qatja/processing
 
 ## Download
 
-[Download version 1.3.0 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.3.0/mqtt.zip)
+[Download version 1.4.0 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.4.0/mqtt.zip)
 
 ## Example
 
