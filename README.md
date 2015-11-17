@@ -37,38 +37,60 @@ void messageReceived(String topic, byte[] payload) {
 
 ## API
 
-- **`new MQTTClient(PApplet parent)`**
+Instantiate a new client by supplying the parent applet:
 
-Instantiates a new client by supplying the parent applet. The constructor expects the following method to be declared on the parent applet: `void messageReceived(String topic, byte[] payload)`. That callback will then be invoked in the future with incoming messages.
+```java
+MQTTClient client = new MQTTClient(PApplet parent);
+```
 
-- **`MQTTClient#setWill(String topic, String payload)`**
-- **`MQTTClient#setWill(String topic, String payload, int qos, boolean retained)`**
+- The constructor expects the following method to be declared on the parent applet: `void messageReceived(String topic, byte[] payload)`. That callback will then be invoked in the future with incoming messages.
 
-Sets the will message that gets transmitted to the server in all subsequent connect commands. The QoS level and retained flag default to `0` and `false` respectively.
+Set the will message that gets transmitted to the server in all subsequent connect commands:
 
-- **`MQTTClient#connect(String brokerURI)`**
-- **`MQTTClient#connect(String brokerURI, String clientId)`**
-- **`MQTTClient#connect(String brokerURI, String clientId, boolean cleanSession)`**
+```java
+client.setWill(String topic, String payload);
+client.setWill(String topic, String payload, int qos, boolean retained);
+```
 
-Connects to the supplied broker by parsing the URL and setting the optionally supplied client id and clean session flag. A client id will be generated if needed and the clean session flag defaults to `true`.
+- The QoS level and retained flag default to `0` and `false` respectively.
 
-- **`MQTTClient#publish(String topic)`**
-- **`MQTTClient#publish(String topic, String payload)`**
-- **`MQTTClient#publish(String topic, String payload, int qos, boolean retained)`**
-- **`MQTTClient#publish(String topic, byte[] payload)`**
-- **`MQTTClient#publish(String topic, byte[] payload, int qos, boolean retained)`**
+Connect to the supplied broker by parsing the URL and setting the optionally supplied client id and clean session flag:
 
-Publishes a message to the broker using the supplied topic and the optional payload in form of a String or byte-array. If available it will set the QoS level as well as the retained flag appropriately. The QoS level and the retained flag default to `0` and `false` respectively.
+```java
+client.connect(String brokerURI);
+client.connect(String brokerURI, String clientId);
+client.connect(String brokerURI, String clientId, boolean cleanSession);
+```
 
-- **`MQTTClient#subscribe(String topic)`**
-- **`MQTTClient#subscribe(String topic, int qos)`**
+- A client id will be generated if needed and the clean session flag defaults to `true`.
 
-Subscribes to the supplied topic using the optionally provided QoS level that defaults to `0`.
+Publish a message to the broker using the supplied topic and the optional payload in form of a String or byte-array. If available it will set the QoS level as well as the retained flag appropriately.
 
-- **`MQTTClient#unsubscribe(String topic)`**
+```java
+client.publish(String topic)
+client.publish(String topic, String payload)
+client.publish(String topic, String payload, int qos, boolean retained)
+client.publish(String topic, byte[] payload)
+client.publish(String topic, byte[] payload, int qos, boolean retained)
+```
 
-Unsubscribes from the supplied topic.
+- The QoS level and the retained flag default to `0` and `false` respectively.
 
-- **`MQTTClient#disconnect()`**
+Subscribe to the supplied topic using the optionally provided QoS level that defaults to `0`:
 
-Disconnects from the broker.
+```java
+client.subscribe(String topic)
+client.subscribe(String topic, int qos)
+```
+
+Unsubscribe from the supplied topic:
+
+```java
+client.unsubscribe(String topic)
+```
+
+Disconnect from the broker:
+
+```java
+client.disconnect()
+```
