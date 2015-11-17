@@ -67,11 +67,11 @@ client.connect(String brokerURI, String clientId, boolean cleanSession);
 Publish a message to the broker using the supplied topic and the optional payload in form of a String or byte-array. If available it will set the QoS level as well as the retained flag appropriately.
 
 ```java
-client.publish(String topic)
-client.publish(String topic, String payload)
-client.publish(String topic, String payload, int qos, boolean retained)
-client.publish(String topic, byte[] payload)
-client.publish(String topic, byte[] payload, int qos, boolean retained)
+client.publish(String topic);
+client.publish(String topic, String payload);
+client.publish(String topic, String payload, int qos, boolean retained);
+client.publish(String topic, byte[] payload);
+client.publish(String topic, byte[] payload, int qos, boolean retained);
 ```
 
 - The QoS level and the retained flag default to `0` and `false` respectively.
@@ -79,18 +79,18 @@ client.publish(String topic, byte[] payload, int qos, boolean retained)
 Subscribe to the supplied topic using the optionally provided QoS level that defaults to `0`:
 
 ```java
-client.subscribe(String topic)
-client.subscribe(String topic, int qos)
+client.subscribe(String topic);
+client.subscribe(String topic, int qos);
 ```
 
 Unsubscribe from the supplied topic:
 
 ```java
-client.unsubscribe(String topic)
+client.unsubscribe(String topic);
 ```
 
 Disconnect from the broker:
 
 ```java
-client.disconnect()
+client.disconnect();
 ```
