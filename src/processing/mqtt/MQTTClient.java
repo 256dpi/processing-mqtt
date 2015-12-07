@@ -38,7 +38,7 @@ import java.lang.Throwable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -83,7 +83,7 @@ class Will {
 public class MQTTClient implements MqttCallback {
   PApplet parent;
 
-  ArrayList<Message> messages;
+  CopyOnWriteArrayList<Message> messages;
   Will will;
 
   Method messageReceivedMethod;
@@ -99,7 +99,7 @@ public class MQTTClient implements MqttCallback {
    */
   public MQTTClient(PApplet parent) {
     this.parent = parent;
-    messages = new ArrayList<Message>(10);
+    messages = new CopyOnWriteArrayList<Message>();
     parent.registerMethod("dispose", this);
     parent.registerMethod("draw", this);
     messageReceivedMethod = findCallback("messageReceived");
@@ -328,12 +328,12 @@ public class MQTTClient implements MqttCallback {
   }
 
   public void draw() throws Exception {
-    synchronized (messages) {
-      for(Message message: messages) {
-        messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
-      }
-      messages.clear();
+    for(Message message: messages) {
+      messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
+      messages.remove(message);
     }
+
+    messages.clear();
   }
 
   @Override
@@ -342,9 +342,7 @@ public class MQTTClient implements MqttCallback {
   @Override
   public void messageArrived(String topic, MqttMessage mqttMessage) {
     if(messageReceivedMethod != null) {
-      synchronized (messages) {
-        messages.add(new Message(topic, mqttMessage));
-      }
+      messages.add(new Message(topic, mqttMessage));
     }
   }
 
