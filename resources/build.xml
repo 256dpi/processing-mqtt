@@ -1,5 +1,4 @@
 <project name="ProcessingLibs" default="clean" basedir="../">
-
     
 <!--	
 		Properties for your project should be set and modified in the  
@@ -9,17 +8,13 @@
 		If you have recommendations for improvements, please let Elie know 
 		at prisonerjohn@gmail.com
 -->
-    
-	
 
 	<property file="./resources/build.properties" />
 	
 	<description>
         ${ant.description}
     </description>
-    	
-	
-	
+
     
 	<property name="line" value="------------------------------------------------------------------------------------------------" />
 	
@@ -48,7 +43,6 @@
 	<property name="project.bin" location="bin"/>
 	<property name="project.bin.data" location="${project.bin}/data"/>
 	<property name="project.examples" location="examples"/>
-	<property name="project.reference" location="reference"/>
 	<property name="project.dist" location="distribution"/>
 	<property name="project.dist.version" location="distribution/${project.name}-${library.version}"/>
 	<property name="libprops.source" location="resources/library.properties"/>
@@ -66,14 +60,12 @@
 		<fileset dir="${project.lib}" includes="**/*.jar" />
 	</path>		
 
-	
 
 	<!-- Create the time stamp -->
 	<tstamp> 
 		<format property="date" pattern="MM/dd/yyyy" offset="0" unit="hour"/>
 	</tstamp>
-	
-	
+
 	
 	<target name="library.run">
         <mkdir dir="${project.bin}"/>
@@ -89,15 +81,13 @@
 	  	<delete dir="${project.tmp}"/>
 	</target>
 	
-	
-	
+
 	<target name="generate.libprops" if="is.normal">
 		<property name="libprops.destination" location="${project.tmp}/${project.name}/library.properties"/>
 		<copy file="${libprops.source}" tofile="${libprops.destination}" />
 		<antcall target="parse.file"><param name="file" value="${libprops.destination}"/></antcall>
 	</target>
-		
-	
+
 	
 	<target name="copyToSketchbook">
 		<echo message="copying files to the ${folder} folder in your sketchbook." />
@@ -134,7 +124,6 @@
 		<mkdir dir="${project.tmp}/${project.name}" />
 	  	<mkdir dir="${project.tmp}/${project.name}/${folder}" />
   		<mkdir dir="${project.tmp}/${project.name}/examples" />
-	  	<mkdir dir="${project.tmp}/${project.name}/reference" />
   		<mkdir dir="${project.tmp}/${project.name}/src" />
   		<copy todir="${project.tmp}/${project.name}/examples">
   			<fileset dir="${project.examples}">
@@ -216,7 +205,6 @@
     </target>
 	
 	
-	
 	<target name="generate.zip" if="is.normal">
 		<!-- zip the distribution of the library -->
 		
@@ -242,23 +230,11 @@
 		
 		<delete dir="${project.dist.version}/tmp" />
 	</target>
-	
 
 	
 	<target name="clean" depends="library.run">
 		<delete dir="${project.bin}"/>
 		<delete dir="${project.tmp}"/>
-		<echo>
-		
-${line}
-Name        ${project.name} 
-Version     ${library.prettyVersion} (${library.version})
-Compiled    ${project.compile}
-Sketchbook  ${sketchbook.location}
-${line}
-done, finished.
-${line}
-		</echo>
 	</target>
 	
 </project>
