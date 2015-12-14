@@ -1,3 +1,12 @@
+// This example sketch connects to shiftr.io
+// and sends a message on every kestroke.
+//
+// After starting the sketch you can find the
+// client here: https://shiftr.io/try.
+//
+// by Joël Gähwiler
+// https://github.com/256dpi/processing-mqtt
+
 import processing.mqtt.*;
 
 MQTTClient client;
