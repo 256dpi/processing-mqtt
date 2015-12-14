@@ -52,8 +52,6 @@
 	<property name="project.reference" location="reference"/>
 	<property name="project.dist" location="distribution"/>
 	<property name="project.dist.version" location="distribution/${project.name}-${library.version}"/>
-	<property name="install.source" location="resources/install_instructions.txt"/>
-	<property name="install.destination" location="${project.dist.version}/INSTALL.txt"/>
 	<property name="libprops.source" location="resources/library.properties"/>
 	
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
@@ -106,12 +104,9 @@ ${line}
 		<antcall target="generate.source" />
 		<antcall target="compile" />
 	  	<antcall target="generate.jar"><param name="folder" value="library"/></antcall>
-	  	<antcall target="generate.javadoc" />
 		<antcall target="generate.libprops" />
 		<antcall target="copyToSketchbook"><param name="folder" value="libraries"/></antcall>
 		<antcall target="generate.distribution" />
-		<antcall target="generate.install.library" />
-		<antcall target="generate.web" />
 	  	<antcall target="generate.zip" />	
 	  	<delete dir="${project.tmp}"/>
 	</target>
@@ -206,53 +201,6 @@ ${line}
 		<move file="${project.tmp}/${project.name}" toDir="${project.dist.version}" />
 	</target>
 	
-	
-	
-	<target name="generate.javadoc" if="is.normal">
-	  	<!-- create the java reference of the library -->
-		<javadoc bottom="Processing library ${project.name} by ${author.name}. ${library.copyright}" 
-				classpath="${classpath.local.location}/core.jar;{project.bin}" 
-				destdir="${project.tmp}/${project.name}/reference" 
-				verbose="false" 
-				stylesheetfile="resources/stylesheet.css" 
-				doctitle="Javadocs: ${project.name}" 
-				public="true" version="false" 
-				windowtitle="Javadocs: ${project.name}">
- 			
- 			<link href="${javadoc.java.href}" />
-			<link href="${javadoc.processing.href}" />
-			<taglet name="ExampleTaglet" path="resources/code" />
- 			<fileset dir="${project.tmp}/${project.name}/src" defaultexcludes="yes">
-			<!-- add packages to be added to reference. -->
-				<include name="**/*"/>
-			</fileset>
-	 	</javadoc>
-	</target>
-	
-	
-	<target name="generate.web" if="is.normal">
-		
-		<mkdir dir="${project.dist.version}/web" />
-  		<copy todir="${project.dist.version}/web/reference">
-  			<fileset dir="${project.dist.version}/${project.name}/reference" />
-  		</copy>
-  	
-  		<copy todir="${project.dist.version}/web/examples">
-  			<fileset dir="${project.dist.version}/${project.name}/examples" />
-	  	</copy>
-	  	
-	  	<copy todir="${project.dist.version}/web">
-  			<fileset dir="${project.web}" />
-	  	</copy>
-	  	
-	  	<antcall target="parse.file"><param name="file" value="${project.dist.version}/web/index.html"/></antcall>
-		
-		<antcall target="processExamples" />
-		
-		<replaceregexp file="${project.dist.version}/web/index.html" match="##examples##" replace="" flags="g" />
-	</target>
-	
-	
     
     <!-- find and replace ##placeholder## keywords in a file -->
     <target name="parse.file">
@@ -288,14 +236,6 @@ ${line}
     	<replaceregexp file="${file}" match="##tested.platform##" replace="${tested.platform}" flags="g" />
     	<replaceregexp file="${file}" match="##tested.processingVersion##" replace="${tested.processingVersion}" flags="g" />
     </target>
-	
-	
-	
-	<target name="generate.install.library" if="is.normal">	
-		<copy file="${install.source}" tofile="${project.dist.version}/INSTALL.txt" />
-		
-		<antcall target="parse.file"><param name="file" value="${install.destination}"/></antcall>
-	</target>	
 	
 	
 	
