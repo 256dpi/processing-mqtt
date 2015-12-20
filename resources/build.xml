@@ -165,7 +165,7 @@
         <replaceregexp file="${file}" match="##compatible.maxRevision##" replace="${compatible.maxRevision}" flags="g" /> 
         
         <replaceregexp file="${file}" match="##library.url##" replace="${library.url}" flags="g" />
-        <replaceregexp file="${file}" match="##library.category##" replace="${library.category}" flags="g" />
+        <replaceregexp file="${file}" match="##library.categories##" replace="${library.categories}" flags="g" />
         <replaceregexp file="${file}" match="##library.sentence##" replace="${library.sentence}" flags="g" />
     	<replaceregexp file="${file}" match="##library.paragraph##" replace="${library.paragraph}" flags="g" />
     	<replaceregexp file="${file}" match="##library.keywords##" replace="${library.keywords}" flags="g" />
