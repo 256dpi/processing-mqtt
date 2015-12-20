@@ -2,7 +2,7 @@
 
 **MQTT library for Processing based on the Eclipse Paho project**
 
-This library bundles the [Java Client](https://eclipse.org/paho/clients/java/) library of the eclipse Paho project and adds a thin wrapper to get a Processing like API.
+This library bundles the [Java Client](https://eclipse.org/paho/clients/java/) library of the Eclipse Paho project and adds a thin wrapper to get a Processing like API.
 
 The library is an alternative to the [Qatja](https://github.com/Qatja/processing) library which only supports a limited set of features.
 
