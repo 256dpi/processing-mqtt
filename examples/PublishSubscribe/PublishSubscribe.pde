@@ -7,7 +7,7 @@
 // by Joël Gähwiler
 // https://github.com/256dpi/processing-mqtt
 
-import processing.mqtt.*;
+import mqtt.*;
 
 MQTTClient client;
 

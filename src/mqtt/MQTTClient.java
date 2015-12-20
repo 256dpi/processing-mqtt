@@ -25,7 +25,7 @@
  * @version     ##library.prettyVersion## (##library.version##)
  */
 
-package processing.mqtt;
+package mqtt;
 
 import java.lang.*;
 import java.lang.Class;

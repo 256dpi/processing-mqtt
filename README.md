@@ -13,7 +13,7 @@ The library is an alternative to the [Qatja](https://github.com/Qatja/processing
 ## Example
 
 ```java
-import processing.mqtt.*;
+import mqtt.*;
 
 MQTTClient client;
 
