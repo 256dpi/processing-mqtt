@@ -95,7 +95,7 @@ public class MQTTClient implements MqttCallback {
    * initialize and start the library.
    *
    * @example PublishSubscribe
-   * @param theParent
+   * @param parent
    */
   public MQTTClient(PApplet parent) {
     this.parent = parent;

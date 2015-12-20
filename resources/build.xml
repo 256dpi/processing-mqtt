@@ -1,4 +1,4 @@
-<project name="ProcessingLibs" default="clean" basedir="../">
+<project name="Processing Library" default="clean" basedir="../">
     
 <!--	
 		Properties for your project should be set and modified in the  
@@ -36,6 +36,7 @@
 	<property name="project.lib" location="lib"/>
 	<property name="project.bin" location="bin"/>
 	<property name="project.examples" location="examples"/>
+    <property name="project.reference" location="reference"/>
 	<property name="project.dist" location="distribution"/>
 	<property name="project.dist.version" location="distribution/${project.name}-${library.version}"/>
 	<property name="libprops.source" location="resources/library.properties"/>
@@ -63,6 +64,7 @@
 		<antcall target="generate.source" />
 		<antcall target="compile" />
 	  	<antcall target="generate.jar"><param name="folder" value="library"/></antcall>
+        <antcall target="generate.javadoc" />
 		<antcall target="generate.libprops" />
 		<antcall target="copyToSketchbook"><param name="folder" value="libraries"/></antcall>
 		<antcall target="generate.distribution" />
@@ -144,6 +146,27 @@
 		<mkdir dir="${project.dist.version}/${project.name}" />
 		<move file="${project.tmp}/${project.name}" toDir="${project.dist.version}" />
 	</target>
+
+    <target name="generate.javadoc" if="is.normal">
+        <!-- create the java reference of the Library -->
+        <javadoc bottom="Processing Library ${project.name} by ${author.name}. ${library.copyright}"
+                 classpath="${classpath.local.location}/core.jar;lib/org.eclipse.paho.client.mqttv3-1.0.1.jar"
+                 destdir="${project.tmp}/${project.name}/reference"
+                 verbose="false"
+                 stylesheetfile="resources/stylesheet.css"
+                 doctitle="Javadocs: ${project.name}"
+                 public="true" version="false"
+                 windowtitle="Javadocs: ${project.name}">
+
+            <link href="${javadoc.java.href}" />
+            <link href="${javadoc.processing.href}" />
+            <taglet name="ExampleTaglet" path="resources/code" />
+            <fileset dir="${project.tmp}/${project.name}/src" defaultexcludes="yes">
+                <!-- add packages to be added to reference. -->
+                <include name="**/*"/>
+            </fileset>
+        </javadoc>
+    </target>
 
     <target name="parse.file">
         <echo message="${file}" />
