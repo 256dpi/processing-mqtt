@@ -4,11 +4,13 @@
 
 This library bundles the [Java Client](https://eclipse.org/paho/clients/java/) library of the Eclipse Paho project and adds a thin wrapper to get a Processing like API.
 
-## Download
-
 [Download version 1.6.1 of the library.](https://github.com/256dpi/processing-mqtt/releases/download/v1.6.1/mqtt.zip)
 
+*Or even better use the Library Manager in the Processing IDE.*
+
 ## Example
+
+This example sketch connects to shiftr.io and sends a message on every keystroke. After starting the sketch you can find the client here: <https://shiftr.io/try>.
 
 ```java
 import mqtt.*;

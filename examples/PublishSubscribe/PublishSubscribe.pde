@@ -1,5 +1,5 @@
 // This example sketch connects to shiftr.io
-// and sends a message on every kestroke.
+// and sends a message on every keystroke.
 //
 // After starting the sketch you can find the
 // client here: https://shiftr.io/try.
