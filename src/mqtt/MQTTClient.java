@@ -184,13 +184,15 @@ public class MQTTClient implements MqttCallback {
         options.setWill(will.topic, will.payload, will.qos, will.retained);
       }
 
-      if (uri.getUserInfo()!=null) {
+      if (uri.getUserInfo() != null) {
         String[] auth = uri.getUserInfo().split(":");
+
         if(auth.length > 0) {
-          String user = auth[0];
-          String pass = auth[1];
-          options.setUserName(user);
-          options.setPassword(pass.toCharArray());
+          options.setUserName(auth[0]);
+
+          if(auth.length > 1) {
+            options.setPassword(auth[1].toCharArray());
+          }
         }
       }
 
