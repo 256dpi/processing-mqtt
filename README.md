@@ -94,3 +94,7 @@ Disconnect from the broker:
 ```java
 void client.disconnect();
 ```
+
+## Notes
+
+- If you're running the sketch via the Android Mode you need to set the `INTERNET` permission in `Android > Sketch Permissions`.
