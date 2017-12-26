@@ -197,9 +197,9 @@ public class MQTTClient implements MqttCallback {
       }
 
       if (uri.getPort()!=-1){
-        client = new MqttClient("tcp://" + uri.getHost() + ":" + uri.getPort(), clientId, new MemoryPersistence());
+        client = new MqttClient(uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(), clientId, new MemoryPersistence());
       } else {
-        client = new MqttClient("tcp://" + uri.getHost(), clientId, new MemoryPersistence());
+        client = new MqttClient(uri.getScheme() + "://" + uri.getHost(), clientId, new MemoryPersistence());
       }
 
       client.setCallback(this);
