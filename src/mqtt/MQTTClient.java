@@ -196,16 +196,23 @@ public class MQTTClient implements MqttCallback {
         }
       }
 
-      if (uri.getPort()!=-1){
-        client = new MqttClient(uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(), clientId, new MemoryPersistence());
-      } else {
-        client = new MqttClient(uri.getScheme() + "://" + uri.getHost(), clientId, new MemoryPersistence());
+      String scheme = uri.getScheme();
+      if (scheme.equals("mqtt")) {
+        scheme = "tcp";
+      } else if(scheme.equals("mqtts")) {
+        scheme = "ssl";
       }
 
+      String loc = scheme + "://" + uri.getHost();
+      if (uri.getPort()!=-1){
+        loc = loc + ":" + uri.getPort();
+      }
+
+      client = new MqttClient(loc, clientId, new MemoryPersistence());
       client.setCallback(this);
       client.connect(options);
 
-      System.out.println("[MQTT] connected to: " + uri.getHost());
+      System.out.println("[MQTT] connected to: " + loc);
     } catch (MqttException e) {
       System.out.println("[MQTT] failed to connect: " + e.getMessage());
     }
