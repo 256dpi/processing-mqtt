@@ -173,11 +173,11 @@ public class MQTTClient implements MqttCallback {
       uri = new URI(brokerURI);
     } catch(URISyntaxException e) {
       System.out.println("[MQTT] failed to parse URI: " + e.getMessage());
+      return;
     }
 
     try {
       MqttConnectOptions options = new MqttConnectOptions();
-
       options.setCleanSession(cleanSession);
 
       if(will != null) {
