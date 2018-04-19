@@ -18,8 +18,8 @@ MQTTClient client;
 void setup() {
   client = new MQTTClient(this);
   client.connect("mqtt://try:try@broker.shiftr.io", "processing");
-  client.subscribe("/example");
-  // client.unsubscribe("/example");
+  client.subscribe("/hello");
+  // client.unsubscribe("/hello");
 }
 
 void draw() {}
