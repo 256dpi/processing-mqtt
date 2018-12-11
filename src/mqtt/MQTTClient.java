@@ -80,7 +80,7 @@ public class MQTTClient implements MqttCallbackExtended {
    *
    * @param parent A reference to the running sketch.
    */
-  public MQTTClient(PApplet parent) {
+  public MQTTClient(PApplet parent) throws Exception {
     // save parent
     this.parent = parent;
 
@@ -92,9 +92,9 @@ public class MQTTClient implements MqttCallbackExtended {
     parent.registerMethod("draw", this);
 
     // find callbacks
-    messageReceivedMethod = findCallback("messageReceived");
-    clientConnectedMethod = findCallback("clientConnected");
-    connectionLostMethod = findCallback("connectionLost");
+    messageReceivedMethod = findMessageReceivedCallback();
+    clientConnectedMethod = findClientConnectedCallback();
+    connectionLostMethod = findConnectionLostCallback();
   }
 
   /**
@@ -307,7 +307,7 @@ public class MQTTClient implements MqttCallbackExtended {
     try {
       client.disconnect();
     } catch (MqttException e) {
-      System.out.println("[MQTT] Failed to disconnect!" + e.getMessage());
+      throw new Exception("[MQTT] Failed to disconnect: " + e.getMessage(), e);
     }
   }
 
@@ -315,6 +315,7 @@ public class MQTTClient implements MqttCallbackExtended {
     try {
       disconnect();
     } catch (Exception e) {
+      // ignore
     }
   }
 
@@ -347,11 +348,26 @@ public class MQTTClient implements MqttCallbackExtended {
     System.out.println("[MQTT] Got connection! (" + b + ", " + s + " )");
   }
 
-  private Method findCallback(final String name) {
+  private Method findMessageReceivedCallback() throws Exception {
     try {
-      return parent.getClass().getMethod(name, String.class, byte[].class);
+      return parent.getClass().getMethod("messageReceived", String.class, byte[].class);
     } catch (Exception e) {
-      System.out.println("[MQTT] Callback not found!");
+      throw new Exception("MQTT] Callback not found!", e);
+    }
+  }
+
+  private Method findClientConnectedCallback() {
+    try {
+      return parent.getClass().getMethod("clientConnected", boolean.class);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private Method findConnectionLostCallback() {
+    try {
+      return parent.getClass().getMethod("connectionLost");
+    } catch (Exception e) {
       return null;
     }
   }
