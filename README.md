@@ -20,8 +20,6 @@ MQTTClient client;
 void setup() {
   client = new MQTTClient(this);
   client.connect("mqtt://try:try@broker.shiftr.io", "processing");
-  client.subscribe("/example");
-  // client.unsubscribe("/example");
 }
 
 void draw() {}
@@ -30,9 +28,20 @@ void keyPressed() {
   client.publish("/hello", "world");
 }
 
+void clientConnected() {
+  println("client connected");
+
+  client.subscribe("/hello");
+}
+
 void messageReceived(String topic, byte[] payload) {
   println("new message: " + topic + " - " + new String(payload));
 }
+
+void connectionLost() {
+  println("connection lost");
+}
+
 ```
 
 ## API
@@ -44,6 +53,7 @@ MQTTClient client = new MQTTClient(PApplet parent);
 ```
 
 - The constructor expects the following method to be declared on the parent applet: `void messageReceived(String topic, byte[] payload)`. That callback will then be invoked in the future with incoming messages.
+- Additionally, the following callbacks will be detected: `void clientConnected()` and `void connectionLost()` and executed appropriately.
 
 Set the will message that gets transmitted to the server in all subsequent connect commands:
 
