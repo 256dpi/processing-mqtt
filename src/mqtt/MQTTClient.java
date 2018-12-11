@@ -1,34 +1,30 @@
 /**
  * ##library.name##
- * ##library.sentence##
- * ##library.url##
  *
- * Copyright ##copyright## ##author##
+ * <p>##library.sentence##
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General
- * Public License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA  02111-1307  USA
- * 
- * @author      ##author##
- * @modified    ##date##
- * @version     ##library.prettyVersion## (##library.version##)
+ * <p>##library.url##
+ *
+ * <p>Copyright ##copyright## ##author##
+ *
+ * <p>This library is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * <p>This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU Lesser General Public License along with this
+ * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
+ *
+ * @author ##author##
+ * @modified ##date##
+ * @version ##library.prettyVersion## (##library.version##)
  */
-
 package mqtt;
 
-import java.lang.*;
-import java.lang.Class;
 import java.lang.reflect.*;
 import java.lang.Exception;
 import java.lang.Override;
@@ -41,14 +37,8 @@ import java.nio.charset.Charset;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.paho.client.mqttv3.*;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import processing.core.PApplet;
+import org.eclipse.paho.client.mqttv3.persist.*;
+import processing.core.*;
 
 class Message {
   String topic;
@@ -74,45 +64,46 @@ class Will {
   }
 }
 
-/**
- * An MQTTClient that can publish and subscribe.
- *
- * @example PublishSubscribe
- */
-
-public class MQTTClient implements MqttCallback {
-  PApplet parent;
-
-  CopyOnWriteArrayList<Message> messages;
-  Will will;
-
-  Method messageReceivedMethod;
-
-  public MqttClient client;
+/** An MQTTClient that can publish and subscribe. */
+public class MQTTClient implements MqttCallbackExtended {
+  private MqttAsyncClient client;
+  private PApplet parent;
+  private CopyOnWriteArrayList<Message> messages;
+  private Will will;
+  private Method messageReceivedMethod;
+  private Method clientConnectedMethod;
+  private Method connectionLostMethod;
 
   /**
-   * The constructor, usually called in the setup() method in your sketch to
-   * initialize and start the library.
+   * The constructor, usually called in the setup() method in your sketch to initialize and start
+   * the library.
    *
-   * @example PublishSubscribe
-   * @param parent
+   * @param parent A reference to the running sketch.
    */
   public MQTTClient(PApplet parent) {
+    // save parent
     this.parent = parent;
-    messages = new CopyOnWriteArrayList<Message>();
+
+    // init messages list
+    messages = new CopyOnWriteArrayList<>();
+
+    // register callbacks
     parent.registerMethod("dispose", this);
     parent.registerMethod("draw", this);
+
+    // find callbacks
     messageReceivedMethod = findCallback("messageReceived");
-    System.out.println("##library.name## ##library.prettyVersion## by ##author##");
+    clientConnectedMethod = findCallback("clientConnected");
+    connectionLostMethod = findCallback("connectionLost");
   }
 
   /**
    * Set a last will message with topic, payload, QoS and the retained flag.
    *
-   * @param topic
-   * @param payload
-   * @param qos
-   * @param retained
+   * @param topic The topic.
+   * @param payload The payload.
+   * @param qos The qos level.
+   * @param retained The retainged flag.
    */
   public void setWill(String topic, String payload, int qos, boolean retained) {
     setWill(topic, payload.getBytes(Charset.forName("UTF-8")), qos, retained);
@@ -121,8 +112,8 @@ public class MQTTClient implements MqttCallback {
   /**
    * Set a last will message with topic and payload.
    *
-   * @param topic
-   * @param payload
+   * @param topic The topic.
+   * @param payload The payload.
    */
   public void setWill(String topic, String payload) {
     setWill(topic, payload, 0, false);
@@ -131,10 +122,10 @@ public class MQTTClient implements MqttCallback {
   /**
    * Set a last will message with topic, payload, QoS and the retained flag.
    *
-   * @param topic
-   * @param payload
-   * @param qos
-   * @param retained
+   * @param topic The topic.
+   * @param payload The payload.
+   * @param qos The qos.
+   * @param retained The retained flag.
    */
   public void setWill(String topic, byte[] payload, int qos, boolean retained) {
     will = new Will(topic, payload, qos, retained);
@@ -143,54 +134,53 @@ public class MQTTClient implements MqttCallback {
   /**
    * Connect to a broker using only a broker URI.
    *
-   * @param brokerURI
+   * @param brokerURI The broker URI.
    */
-  public void connect(String brokerURI) {
+  public void connect(String brokerURI) throws Exception {
     connect(brokerURI, MqttClient.generateClientId());
   }
 
   /**
    * Connect to a broker using an broker URI and client ID.
    *
-   * @param brokerURI
-   * @param clientID
+   * @param brokerURI The broker URI.
+   * @param clientID The client ID.
    */
-  public void connect(String brokerURI, String clientID) {
+  public void connect(String brokerURI, String clientID) throws Exception {
     connect(brokerURI, clientID, true);
   }
 
   /**
    * Connect to a broker using an broker URI, client Id and cleanSession flag.
    *
-   * @example PublishSubscribe
-   * @param brokerURI
-   * @param clientId
-   * @param cleanSession
+   * @param brokerURI The broker URI.
+   * @param clientId The client ID.
+   * @param cleanSession The clean session flag.
    */
-  public void connect(String brokerURI, String clientId, boolean cleanSession) {
+  public void connect(String brokerURI, String clientId, boolean cleanSession) throws Exception {
     URI uri = null;
     try {
       uri = new URI(brokerURI);
-    } catch(URISyntaxException e) {
-      System.out.println("[MQTT] failed to parse URI: " + e.getMessage());
-      return;
+    } catch (URISyntaxException e) {
+      throw new Exception("[MQTT] Failed to parse URI: " + e.getMessage(), e);
     }
 
     try {
       MqttConnectOptions options = new MqttConnectOptions();
       options.setCleanSession(cleanSession);
+      options.setAutomaticReconnect(true);
 
-      if(will != null) {
+      if (will != null) {
         options.setWill(will.topic, will.payload, will.qos, will.retained);
       }
 
       if (uri.getUserInfo() != null) {
         String[] auth = uri.getUserInfo().split(":");
 
-        if(auth.length > 0) {
+        if (auth.length > 0) {
           options.setUserName(auth[0]);
 
-          if(auth.length > 1) {
+          if (auth.length > 1) {
             options.setPassword(auth[1].toCharArray());
           }
         }
@@ -199,31 +189,31 @@ public class MQTTClient implements MqttCallback {
       String scheme = uri.getScheme();
       if (scheme.equals("mqtt")) {
         scheme = "tcp";
-      } else if(scheme.equals("mqtts")) {
+      } else if (scheme.equals("mqtts")) {
         scheme = "ssl";
       }
 
       String loc = scheme + "://" + uri.getHost();
-      if (uri.getPort()!=-1){
+      if (uri.getPort() != -1) {
         loc = loc + ":" + uri.getPort();
       }
 
-      client = new MqttClient(loc, clientId, new MemoryPersistence());
+      client = new MqttAsyncClient(loc, clientId, new MemoryPersistence());
       client.setCallback(this);
       client.connect(options);
 
-      System.out.println("[MQTT] connected to: " + loc);
+      // TODO: Call connected handler.
     } catch (MqttException e) {
-      System.out.println("[MQTT] failed to connect: " + e.getMessage());
+      throw new Exception("[MQTT] Failed to connect:: " + e.getMessage(), e);
     }
   }
 
   /**
    * Publish a message with a topic.
    *
-   * @param topic
+   * @param topic The topic.
    */
-  public void publish(String topic) {
+  public void publish(String topic) throws Exception {
     byte[] bytes = {};
     publish(topic, bytes);
   }
@@ -231,113 +221,105 @@ public class MQTTClient implements MqttCallback {
   /**
    * Publish a message with a topic and payload.
    *
-   * @example PublishSubscribe
-   * @param topic
-   * @param payload
+   * @param topic The topic.
+   * @param payload The payload.
    */
-  public void publish(String topic, String payload) {
+  public void publish(String topic, String payload) throws Exception {
     publish(topic, payload, 0, false);
   }
 
   /**
    * Publish a message with a topic, payload qos and retain flag.
    *
-   * @param topic
-   * @param payload
-   * @param qos
-   * @param retained
+   * @param topic The topic.
+   * @param payload The payload.
+   * @param qos The qos level.
+   * @param retained The retained flag.
    */
-  public void publish(String topic, String payload, int qos, boolean retained) {
+  public void publish(String topic, String payload, int qos, boolean retained) throws Exception {
     publish(topic, payload.getBytes(Charset.forName("UTF-8")), qos, retained);
   }
 
   /**
    * Publish a message with a topic and payload.
    *
-   * @param topic
-   * @param payload
+   * @param topic The topic.
+   * @param payload The payload.
    */
-  public void publish(String topic, byte[] payload) {
+  public void publish(String topic, byte[] payload) throws Exception {
     publish(topic, payload, 0, false);
   }
 
   /**
    * Publish a message with a topic, payload qos and retain flag.
    *
-   * @param topic
-   * @param payload
-   * @param qos
-   * @param retained
+   * @param topic The topic.
+   * @param payload The payload.
+   * @param qos The qos level.
+   * @param retained The retained flag.
    */
-  public void publish(String topic, byte[] payload, int qos, boolean retained) {
+  public void publish(String topic, byte[] payload, int qos, boolean retained) throws Exception {
     try {
       client.publish(topic, payload, qos, retained);
     } catch (MqttException e) {
-      System.out.println("[MQTT] failed to publish: " + e.getMessage());
+      throw new Exception("[MQTT] Failed to publish: " + e.getMessage(), e);
     }
   }
 
   /**
    * Subscribe a topic.
    *
-   * @example PublishSubscribe
-   * @param topic
+   * @param topic The topic.
    */
-  public void subscribe(String topic) {
-    try {
-      client.subscribe(topic, 0);
-    } catch (MqttException e) {
-      System.out.println("[MQTT] failed to subscribe: " + e.getMessage());
-    }
+  public void subscribe(String topic) throws Exception {
+    this.subscribe(topic, 0);
   }
 
   /**
    * Subscribe a topic with QoS.
    *
-   * @param topic
-   * @param qos
+   * @param topic The topic.
+   * @param qos The qos level.
    */
-  public void subscribe(String topic, int qos) {
+  public void subscribe(String topic, int qos) throws Exception {
     try {
       client.subscribe(topic, qos);
     } catch (MqttException e) {
-      System.out.println("[MQTT] failed to subscribe: " + e.getMessage());
+      throw new Exception("[MQTT] Failed to subscribe: " + e.getMessage(), e);
     }
   }
 
   /**
-   * Unsubscrbe a topic.
+   * Unsubscribe a topic.
    *
-   * @example PublishSubscribe
-   * @param topic
+   * @param topic The topic.
    */
-  public void unsubscribe(String topic) {
+  public void unsubscribe(String topic) throws Exception {
     try {
       client.unsubscribe(topic);
     } catch (MqttException e) {
-      System.out.println("[MQTT] failed to unsubscribe: " + e.getMessage());
+      throw new Exception("[MQTT] Failed to unsubscribe: " + e.getMessage(), e);
     }
   }
 
-  /**
-   * Disconnect from the broker.
-   *
-   * @example PublishSubscribe
-   */
-  public void disconnect() {
+  /** Disconnect from the broker. */
+  public void disconnect() throws Exception {
     try {
       client.disconnect();
     } catch (MqttException e) {
-      System.out.println("[MQTT] failed to disconnect!" + e.getMessage());
+      System.out.println("[MQTT] Failed to disconnect!" + e.getMessage());
     }
   }
 
   public void dispose() {
-    disconnect();
+    try {
+      disconnect();
+    } catch (Exception e) {
+    }
   }
 
   public void draw() throws Exception {
-    for(Message message: messages) {
+    for (Message message : messages) {
       messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
       messages.remove(message);
     }
@@ -350,21 +332,26 @@ public class MQTTClient implements MqttCallback {
 
   @Override
   public void messageArrived(String topic, MqttMessage mqttMessage) {
-    if(messageReceivedMethod != null) {
+    if (messageReceivedMethod != null) {
       messages.add(new Message(topic, mqttMessage));
     }
   }
 
   @Override
   public void connectionLost(Throwable throwable) {
-    System.out.println("[MQTT] lost connection!" + throwable.getMessage());
+    System.out.println("[MQTT] Lost connection! (" + throwable.getMessage() + ")");
+  }
+
+  @Override
+  public void connectComplete(boolean b, String s) {
+    System.out.println("[MQTT] Got connection! (" + b + ", " + s + " )");
   }
 
   private Method findCallback(final String name) {
     try {
       return parent.getClass().getMethod(name, String.class, byte[].class);
     } catch (Exception e) {
-      System.out.println("[MQTT] messageReceived callback not found!");
+      System.out.println("[MQTT] Callback not found!");
       return null;
     }
   }
