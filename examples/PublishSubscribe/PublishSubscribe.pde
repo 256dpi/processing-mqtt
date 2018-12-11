@@ -26,8 +26,8 @@ void keyPressed() {
   client.publish("/hello", "world");
 }
 
-void clientConnected(boolean sessionResumed) {
-  println("connected: " + sessionResumed);
+void clientConnected() {
+  println("client connected");
 
   client.subscribe("/hello");
 }

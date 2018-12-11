@@ -52,12 +52,10 @@ class Message {
 class Event {
   boolean clientConnected;
   boolean connectionLost;
-  boolean sessionResumed;
 
-  Event(boolean clientConnected, boolean connectionLost, boolean sessionResumed) {
+  Event(boolean clientConnected, boolean connectionLost) {
     this.clientConnected = clientConnected;
     this.connectionLost = connectionLost;
-    this.sessionResumed = sessionResumed;
   }
 }
 
@@ -343,7 +341,7 @@ public class MQTTClient implements MqttCallbackExtended {
       // invoke client connected callback
       if (event.clientConnected && clientConnectedMethod != null) {
         try {
-          clientConnectedMethod.invoke(parent, event.sessionResumed);
+          clientConnectedMethod.invoke(parent);
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
@@ -377,7 +375,7 @@ public class MQTTClient implements MqttCallbackExtended {
 
   @Override
   public void connectComplete(boolean b, String s) {
-    events.add(new Event(true, false, b));
+    events.add(new Event(true, false));
   }
 
   @Override
@@ -390,7 +388,7 @@ public class MQTTClient implements MqttCallbackExtended {
 
   @Override
   public void connectionLost(Throwable throwable) {
-    events.add(new Event(false, true, false));
+    events.add(new Event(false, true));
   }
 
   private Method findMessageReceivedCallback() {
@@ -403,7 +401,7 @@ public class MQTTClient implements MqttCallbackExtended {
 
   private Method findClientConnectedCallback() {
     try {
-      return parent.getClass().getMethod("clientConnected", boolean.class);
+      return parent.getClass().getMethod("clientConnected");
     } catch (Exception e) {
       return null;
     }
