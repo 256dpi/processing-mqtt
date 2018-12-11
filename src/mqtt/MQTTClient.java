@@ -84,6 +84,8 @@ public class MQTTClient implements MqttCallbackExtended {
   private Method clientConnectedMethod;
   private Method connectionLostMethod;
 
+  private final static long TIMEOUT = 2000;
+
   /**
    * The constructor, usually called in the setup() method in your sketch to initialize and start
    * the library.
@@ -222,7 +224,7 @@ public class MQTTClient implements MqttCallbackExtended {
       client.setCallback(this);
 
       // connect to broker
-      client.connect(options);
+      client.connect(options).waitForCompletion(TIMEOUT);
     } catch (MqttException e) {
       throw new RuntimeException("[MQTT] Failed to connect:: " + e.getMessage(), e);
     }
@@ -280,7 +282,7 @@ public class MQTTClient implements MqttCallbackExtended {
    */
   public void publish(String topic, byte[] payload, int qos, boolean retained) {
     try {
-      client.publish(topic, payload, qos, retained);
+      client.publish(topic, payload, qos, retained).waitForCompletion(TIMEOUT);
     } catch (MqttException e) {
       throw new RuntimeException("[MQTT] Failed to publish: " + e.getMessage(), e);
     }
@@ -303,7 +305,7 @@ public class MQTTClient implements MqttCallbackExtended {
    */
   public void subscribe(String topic, int qos) {
     try {
-      client.subscribe(topic, qos);
+      client.subscribe(topic, qos).waitForCompletion(TIMEOUT);
     } catch (MqttException e) {
       throw new RuntimeException("[MQTT] Failed to subscribe: " + e.getMessage(), e);
     }
@@ -316,7 +318,7 @@ public class MQTTClient implements MqttCallbackExtended {
    */
   public void unsubscribe(String topic) {
     try {
-      client.unsubscribe(topic);
+      client.unsubscribe(topic).waitForCompletion(TIMEOUT);
     } catch (MqttException e) {
       throw new RuntimeException("[MQTT] Failed to unsubscribe: " + e.getMessage(), e);
     }
@@ -325,7 +327,7 @@ public class MQTTClient implements MqttCallbackExtended {
   /** Disconnect from the broker. */
   public void disconnect() {
     try {
-      client.disconnect();
+      client.disconnect().waitForCompletion(TIMEOUT);
     } catch (MqttException e) {
       throw new RuntimeException("[MQTT] Failed to disconnect: " + e.getMessage(), e);
     }
