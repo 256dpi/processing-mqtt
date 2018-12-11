@@ -18,8 +18,6 @@ MQTTClient client;
 void setup() {
   client = new MQTTClient(this);
   client.connect("mqtt://try:try@broker.shiftr.io", "processing");
-  client.subscribe("/hello");
-  // client.unsubscribe("/hello");
 }
 
 void draw() {}
@@ -28,6 +26,16 @@ void keyPressed() {
   client.publish("/hello", "world");
 }
 
+void clientConnected(boolean sessionResumed) {
+  println("connected: " + sessionResumed);
+
+  client.subscribe("/hello");
+}
+
 void messageReceived(String topic, byte[] payload) {
   println("new message: " + topic + " - " + new String(payload));
+}
+
+void connectionLost() {
+  println("connection lost");
 }

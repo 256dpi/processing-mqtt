@@ -29,7 +29,6 @@ import java.lang.reflect.*;
 import java.lang.Exception;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.System;
 import java.lang.Throwable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,6 +46,18 @@ class Message {
   Message(String topic, MqttMessage message) {
     this.topic = topic;
     this.message = message;
+  }
+}
+
+class Event {
+  boolean clientConnected;
+  boolean connectionLost;
+  boolean sessionResumed;
+
+  Event(boolean clientConnected, boolean connectionLost, boolean sessionResumed) {
+    this.clientConnected = clientConnected;
+    this.connectionLost = connectionLost;
+    this.sessionResumed = sessionResumed;
   }
 }
 
@@ -69,6 +80,7 @@ public class MQTTClient implements MqttCallbackExtended {
   private MqttAsyncClient client;
   private PApplet parent;
   private CopyOnWriteArrayList<Message> messages;
+  private CopyOnWriteArrayList<Event> events;
   private Will will;
   private Method messageReceivedMethod;
   private Method clientConnectedMethod;
@@ -80,12 +92,13 @@ public class MQTTClient implements MqttCallbackExtended {
    *
    * @param parent A reference to the running sketch.
    */
-  public MQTTClient(PApplet parent) throws Exception {
+  public MQTTClient(PApplet parent) {
     // save parent
     this.parent = parent;
 
-    // init messages list
+    // init messages and events list
     messages = new CopyOnWriteArrayList<>();
+    events = new CopyOnWriteArrayList<>();
 
     // register callbacks
     parent.registerMethod("dispose", this);
@@ -136,7 +149,7 @@ public class MQTTClient implements MqttCallbackExtended {
    *
    * @param brokerURI The broker URI.
    */
-  public void connect(String brokerURI) throws Exception {
+  public void connect(String brokerURI) {
     connect(brokerURI, MqttClient.generateClientId());
   }
 
@@ -146,7 +159,7 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param brokerURI The broker URI.
    * @param clientID The client ID.
    */
-  public void connect(String brokerURI, String clientID) throws Exception {
+  public void connect(String brokerURI, String clientID) {
     connect(brokerURI, clientID, true);
   }
 
@@ -157,35 +170,42 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param clientId The client ID.
    * @param cleanSession The clean session flag.
    */
-  public void connect(String brokerURI, String clientId, boolean cleanSession) throws Exception {
-    URI uri = null;
+  public void connect(String brokerURI, String clientId, boolean cleanSession) {
+    // parse uri
+    URI uri;
     try {
       uri = new URI(brokerURI);
     } catch (URISyntaxException e) {
-      throw new Exception("[MQTT] Failed to parse URI: " + e.getMessage(), e);
+      throw new RuntimeException("[MQTT] Failed to parse URI: " + e.getMessage(), e);
     }
 
     try {
+      // prepare connection options
       MqttConnectOptions options = new MqttConnectOptions();
       options.setCleanSession(cleanSession);
       options.setAutomaticReconnect(true);
 
+      // check will messafe
       if (will != null) {
         options.setWill(will.topic, will.payload, will.qos, will.retained);
       }
 
+      // check for auth info
       if (uri.getUserInfo() != null) {
         String[] auth = uri.getUserInfo().split(":");
 
+        // check username
         if (auth.length > 0) {
           options.setUserName(auth[0]);
 
+          // check passsword
           if (auth.length > 1) {
             options.setPassword(auth[1].toCharArray());
           }
         }
       }
 
+      // parse scheme
       String scheme = uri.getScheme();
       if (scheme.equals("mqtt")) {
         scheme = "tcp";
@@ -193,18 +213,20 @@ public class MQTTClient implements MqttCallbackExtended {
         scheme = "ssl";
       }
 
+      // finalize location
       String loc = scheme + "://" + uri.getHost();
       if (uri.getPort() != -1) {
         loc = loc + ":" + uri.getPort();
       }
 
+      // create client
       client = new MqttAsyncClient(loc, clientId, new MemoryPersistence());
       client.setCallback(this);
-      client.connect(options);
 
-      // TODO: Call connected handler.
+      // connect to broker
+      client.connect(options);
     } catch (MqttException e) {
-      throw new Exception("[MQTT] Failed to connect:: " + e.getMessage(), e);
+      throw new RuntimeException("[MQTT] Failed to connect:: " + e.getMessage(), e);
     }
   }
 
@@ -213,7 +235,7 @@ public class MQTTClient implements MqttCallbackExtended {
    *
    * @param topic The topic.
    */
-  public void publish(String topic) throws Exception {
+  public void publish(String topic) {
     byte[] bytes = {};
     publish(topic, bytes);
   }
@@ -224,7 +246,7 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param topic The topic.
    * @param payload The payload.
    */
-  public void publish(String topic, String payload) throws Exception {
+  public void publish(String topic, String payload) {
     publish(topic, payload, 0, false);
   }
 
@@ -236,7 +258,7 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param qos The qos level.
    * @param retained The retained flag.
    */
-  public void publish(String topic, String payload, int qos, boolean retained) throws Exception {
+  public void publish(String topic, String payload, int qos, boolean retained) {
     publish(topic, payload.getBytes(Charset.forName("UTF-8")), qos, retained);
   }
 
@@ -246,7 +268,7 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param topic The topic.
    * @param payload The payload.
    */
-  public void publish(String topic, byte[] payload) throws Exception {
+  public void publish(String topic, byte[] payload) {
     publish(topic, payload, 0, false);
   }
 
@@ -258,11 +280,11 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param qos The qos level.
    * @param retained The retained flag.
    */
-  public void publish(String topic, byte[] payload, int qos, boolean retained) throws Exception {
+  public void publish(String topic, byte[] payload, int qos, boolean retained) {
     try {
       client.publish(topic, payload, qos, retained);
     } catch (MqttException e) {
-      throw new Exception("[MQTT] Failed to publish: " + e.getMessage(), e);
+      throw new RuntimeException("[MQTT] Failed to publish: " + e.getMessage(), e);
     }
   }
 
@@ -271,7 +293,7 @@ public class MQTTClient implements MqttCallbackExtended {
    *
    * @param topic The topic.
    */
-  public void subscribe(String topic) throws Exception {
+  public void subscribe(String topic) {
     this.subscribe(topic, 0);
   }
 
@@ -281,11 +303,11 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param topic The topic.
    * @param qos The qos level.
    */
-  public void subscribe(String topic, int qos) throws Exception {
+  public void subscribe(String topic, int qos) {
     try {
       client.subscribe(topic, qos);
     } catch (MqttException e) {
-      throw new Exception("[MQTT] Failed to subscribe: " + e.getMessage(), e);
+      throw new RuntimeException("[MQTT] Failed to subscribe: " + e.getMessage(), e);
     }
   }
 
@@ -294,38 +316,68 @@ public class MQTTClient implements MqttCallbackExtended {
    *
    * @param topic The topic.
    */
-  public void unsubscribe(String topic) throws Exception {
+  public void unsubscribe(String topic) {
     try {
       client.unsubscribe(topic);
     } catch (MqttException e) {
-      throw new Exception("[MQTT] Failed to unsubscribe: " + e.getMessage(), e);
+      throw new RuntimeException("[MQTT] Failed to unsubscribe: " + e.getMessage(), e);
     }
   }
 
   /** Disconnect from the broker. */
-  public void disconnect() throws Exception {
+  public void disconnect() {
     try {
       client.disconnect();
     } catch (MqttException e) {
-      throw new Exception("[MQTT] Failed to disconnect: " + e.getMessage(), e);
+      throw new RuntimeException("[MQTT] Failed to disconnect: " + e.getMessage(), e);
     }
   }
 
   public void dispose() {
-    try {
-      disconnect();
-    } catch (Exception e) {
-      // ignore
-    }
+    disconnect();
   }
 
-  public void draw() throws Exception {
+  public void draw() {
+    // process all queue events
+    for (Event event : events) {
+      // invoke client connected callback
+      if (event.clientConnected && clientConnectedMethod != null) {
+        try {
+          clientConnectedMethod.invoke(parent, event.sessionResumed);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      // invoke connection lost callback
+      if (event.connectionLost && connectionLostMethod != null) {
+        try {
+          connectionLostMethod.invoke(parent);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+
+    // process all messages and invoke message received callback
     for (Message message : messages) {
-      messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
+      try {
+        messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+
       messages.remove(message);
     }
 
+    // clear all queued events and messages
+    events.clear();
     messages.clear();
+  }
+
+  @Override
+  public void connectComplete(boolean b, String s) {
+    events.add(new Event(true, false, b));
   }
 
   @Override
@@ -333,26 +385,19 @@ public class MQTTClient implements MqttCallbackExtended {
 
   @Override
   public void messageArrived(String topic, MqttMessage mqttMessage) {
-    if (messageReceivedMethod != null) {
-      messages.add(new Message(topic, mqttMessage));
-    }
+    messages.add(new Message(topic, mqttMessage));
   }
 
   @Override
   public void connectionLost(Throwable throwable) {
-    System.out.println("[MQTT] Lost connection! (" + throwable.getMessage() + ")");
+    events.add(new Event(false, true, false));
   }
 
-  @Override
-  public void connectComplete(boolean b, String s) {
-    System.out.println("[MQTT] Got connection! (" + b + ", " + s + " )");
-  }
-
-  private Method findMessageReceivedCallback() throws Exception {
+  private Method findMessageReceivedCallback() {
     try {
       return parent.getClass().getMethod("messageReceived", String.class, byte[].class);
     } catch (Exception e) {
-      throw new Exception("MQTT] Callback not found!", e);
+      throw new RuntimeException("MQTT] Callback not found!", e);
     }
   }
 
