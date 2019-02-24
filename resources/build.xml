@@ -150,7 +150,7 @@
     <target name="generate.javadoc" if="is.normal">
         <!-- create the java reference of the Library -->
         <javadoc bottom="Processing Library ${project.name} by ${author.name}. ${library.copyright}"
-                 classpath="${classpath.local.location}/core.jar;lib/org.eclipse.paho.client.mqttv3-1.0.1.jar"
+                 classpath="${classpath.local.location}/core.jar;lib/org.eclipse.paho.client.mqttv3-1.2.0.jar"
                  destdir="${project.tmp}/${project.name}/reference"
                  verbose="false"
                  stylesheetfile="resources/stylesheet.css"
