@@ -39,40 +39,6 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.*;
 import processing.core.*;
 
-class Message {
-  String topic;
-  MqttMessage message;
-
-  Message(String topic, MqttMessage message) {
-    this.topic = topic;
-    this.message = message;
-  }
-}
-
-class Event {
-  boolean clientConnected;
-  boolean connectionLost;
-
-  Event(boolean clientConnected, boolean connectionLost) {
-    this.clientConnected = clientConnected;
-    this.connectionLost = connectionLost;
-  }
-}
-
-class Will {
-  String topic;
-  byte[] payload;
-  int qos;
-  boolean retained;
-
-  Will(String topic, byte[] payload, int qos, boolean retained) {
-    this.topic = topic;
-    this.payload = payload;
-    this.qos = qos;
-    this.retained = retained;
-  }
-}
-
 /** An MQTTClient that can publish and subscribe. */
 public class MQTTClient implements MqttCallbackExtended {
   private MqttAsyncClient client;
