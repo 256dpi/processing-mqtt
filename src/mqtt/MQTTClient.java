@@ -307,30 +307,36 @@ public class MQTTClient implements MqttCallbackExtended {
     // process all queue events
     for (Event event : events) {
       // invoke client connected callback
-      if (event.clientConnected && clientConnectedMethod != null) {
-        try {
-          clientConnectedMethod.invoke(parent);
-        } catch (Exception e) {
-          throw new RuntimeException(e);
+      if (event.clientConnected) {
+        if (clientConnectedMethod != null) {
+          try {
+            clientConnectedMethod.invoke(parent);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
         }
       }
 
       // invoke connection lost callback
-      if (event.connectionLost && connectionLostMethod != null) {
-        try {
-          connectionLostMethod.invoke(parent);
-        } catch (Exception e) {
-          throw new RuntimeException(e);
+      if (event.connectionLost) {
+        if (connectionLostMethod != null) {
+          try {
+            connectionLostMethod.invoke(parent);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
         }
       }
     }
 
     // process all messages and invoke message received callback
     for (Message message : messages) {
-      try {
-        messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
-      } catch (Exception e) {
-        throw new RuntimeException(e);
+      if (messageReceivedMethod != null) {
+        try {
+          messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
       }
 
       messages.remove(message);
