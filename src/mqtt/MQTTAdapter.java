@@ -1,9 +1,9 @@
 package mqtt;
 
 /**
- * Adapter is an abstract class that can be used to implement a listener.
+ * MQTTAdapter is an abstract class that can be used to implement a listener.
  */
-abstract public class Adapter implements Listener {
+abstract public class MQTTAdapter implements MQTTListener {
   @Override
   public void clientConnected() {}
 

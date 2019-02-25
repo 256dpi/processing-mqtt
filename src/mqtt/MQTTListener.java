@@ -1,9 +1,9 @@
 package mqtt;
 
 /**
- * Listener is an interface that can be implemented to receive MQTT events.
+ * MQTTListener is an interface that can be implemented to receive MQTT events.
  */
-public interface Listener {
+public interface MQTTListener {
   /**
    * This method is called once the client successfully connected.
    */

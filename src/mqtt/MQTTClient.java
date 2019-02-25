@@ -46,7 +46,7 @@ public class MQTTClient implements MqttCallbackExtended {
   private CopyOnWriteArrayList<Message> messages;
   private CopyOnWriteArrayList<Event> events;
   private Will will;
-  private Listener listener;
+  private MQTTListener listener;
   private Method messageReceivedMethod;
   private Method clientConnectedMethod;
   private Method connectionLostMethod;
@@ -84,7 +84,7 @@ public class MQTTClient implements MqttCallbackExtended {
    * @param parent A reference to the running sketch.
    * @param listener A class that receives events.
    */
-  public MQTTClient(PApplet parent, Listener listener) {
+  public MQTTClient(PApplet parent, MQTTListener listener) {
     // save parent
     this.parent = parent;
     this.listener = listener;
