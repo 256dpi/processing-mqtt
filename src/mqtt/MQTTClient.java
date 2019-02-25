@@ -46,6 +46,7 @@ public class MQTTClient implements MqttCallbackExtended {
   private CopyOnWriteArrayList<Message> messages;
   private CopyOnWriteArrayList<Event> events;
   private Will will;
+  private Listener listener;
   private Method messageReceivedMethod;
   private Method clientConnectedMethod;
   private Method connectionLostMethod;
@@ -74,6 +75,27 @@ public class MQTTClient implements MqttCallbackExtended {
     messageReceivedMethod = findMessageReceivedCallback();
     clientConnectedMethod = findClientConnectedCallback();
     connectionLostMethod = findConnectionLostCallback();
+  }
+
+  /**
+   * The constructor, usually called in the setup() method in your sketch to initialize and start
+   * the library.
+   *
+   * @param parent A reference to the running sketch.
+   * @param listener A class that receives events.
+   */
+  public MQTTClient(PApplet parent, Listener listener) {
+    // save parent
+    this.parent = parent;
+    this.listener = listener;
+
+    // init messages and events list
+    messages = new CopyOnWriteArrayList<>();
+    events = new CopyOnWriteArrayList<>();
+
+    // register callbacks
+    parent.registerMethod("dispose", this);
+    parent.registerMethod("draw", this);
   }
 
   /**
@@ -308,7 +330,13 @@ public class MQTTClient implements MqttCallbackExtended {
     for (Event event : events) {
       // invoke client connected callback
       if (event.clientConnected) {
-        if (clientConnectedMethod != null) {
+        if(listener != null) {
+          try {
+            listener.clientConnected();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        } else if (clientConnectedMethod != null) {
           try {
             clientConnectedMethod.invoke(parent);
           } catch (Exception e) {
@@ -319,7 +347,13 @@ public class MQTTClient implements MqttCallbackExtended {
 
       // invoke connection lost callback
       if (event.connectionLost) {
-        if (connectionLostMethod != null) {
+        if(listener != null) {
+          try {
+            listener.connectionLost();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        } else if (connectionLostMethod != null) {
           try {
             connectionLostMethod.invoke(parent);
           } catch (Exception e) {
@@ -331,15 +365,19 @@ public class MQTTClient implements MqttCallbackExtended {
 
     // process all messages and invoke message received callback
     for (Message message : messages) {
-      if (messageReceivedMethod != null) {
+      if(listener != null) {
+        try {
+          listener.messageReceived(message.topic, message.message.getPayload());
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      } else if (messageReceivedMethod != null) {
         try {
           messageReceivedMethod.invoke(parent, message.topic, message.message.getPayload());
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
       }
-
-      messages.remove(message);
     }
 
     // clear all queued events and messages
