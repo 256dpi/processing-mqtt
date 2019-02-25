@@ -55,6 +55,14 @@ MQTTClient client = new MQTTClient(PApplet parent);
 - The constructor expects the following method to be declared on the parent applet: `void messageReceived(String topic, byte[] payload)`. That callback will then be invoked in the future with incoming messages.
 - Additionally, the following callbacks will be detected: `void clientConnected()` and `void connectionLost()` and executed appropriately.
 
+Alternatively you can provide your own `Listener` class instead of relying on global methods:
+
+```java
+MQTTClient client = new MQTTClient(PApplet parent, Listener listener);
+```
+
+- You can find the interface here: <https://github.com/256dpi/processing-mqtt/blob/master/src/mqtt/MQTTListener.java>.
+
 Set the will message that gets transmitted to the server in all subsequent connect commands:
 
 ```java

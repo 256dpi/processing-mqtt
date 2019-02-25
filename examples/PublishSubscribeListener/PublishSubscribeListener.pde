@@ -15,7 +15,7 @@ import mqtt.*;
 
 MQTTClient client;
 
-class Adapter extends MQTTAdapter {
+class Adapter implements MQTTListener {
   void clientConnected() {
     println("client connected");
 
