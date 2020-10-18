@@ -312,7 +312,9 @@ public class MQTTClient implements MqttCallbackExtended {
     }
   }
 
-  /** Disconnect from the broker. */
+  /**
+   * Disconnect from the broker.
+   */
   public void disconnect() {
     try {
       client.disconnect().waitForCompletion(TIMEOUT);
@@ -322,7 +324,9 @@ public class MQTTClient implements MqttCallbackExtended {
   }
 
   public void dispose() {
-    disconnect();
+    try {
+      disconnect();
+    } catch(Exception ignored) { }
   }
 
   public void draw() {
